@@ -115,6 +115,30 @@ function dateDifference(dateStr1, dateStr2) {
     return Math.ceil(differenceInTime / (1000 * 60 * 60 * 24));
 }
 
+
+
+function calcMatchWord(str, substring) {
+    const lowerStr = str.toLowerCase();
+    const lowerSubstring = substring.toLowerCase();
+	
+	for (let i = 1; i <= lowerSubstring.length; i++) {
+		if (!lowerStr.includes(lowerSubstring.slice(0,i))) {
+			return (i - 1) * 100 / lowerSubstring.length;
+		}
+	}
+    return 100;
+}
+
+function checkTheme() {
+    const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (isDarkMode) {
+        console.log('Пользователь использует темную тему.');
+    } else {
+        console.log('Пользователь использует светлую тему.');
+    }
+}
+
+
 // Примеры использования функции
 // console.log(formatDate()); // Текущая дата
 // console.log(formatDate(-1)); // Уменьшаем на 1 день
