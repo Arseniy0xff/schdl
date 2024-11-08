@@ -1,8 +1,10 @@
 
 
-
+// Flag responsible for open search place
 let isExpanded = false;
 
+
+// open search place
 function expandDiv() {
 	if (!isExpanded) {
 		isExpanded = true;
@@ -32,6 +34,8 @@ function expandDiv() {
 
 }
 
+
+// close search place
 function shrinkDiv() {
 	if (isExpanded) {
 		isExpanded = false;

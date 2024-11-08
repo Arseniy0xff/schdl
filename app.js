@@ -3,7 +3,7 @@ let DATA_GROUP_TEACH = [], DATA_SCHEDULE = [];
 
 
 
-function getTAndG() {
+function getTAndG(customFunc = () => {}) {
 	let data_out;
 	fetch('http://services.niu.ranepa.ru/API/public/teacher/teachersAndGroupsList')
 		.then(response => {
@@ -15,6 +15,7 @@ function getTAndG() {
 		.then(data => {
 			//console.log(data);
 			DATA_GROUP_TEACH = data;
+			customFunc();
 		})
 		.catch(error => {
 			console.error('There was a problem with the fetch operation:', error);
@@ -83,13 +84,13 @@ function getSchedule(group_id, group_type, date_b, date_e, customFunc = () => { 
 
 
 function saveData_GT() {
-
 	for (let i = 0; i < DATA_GROUP_TEACH.length; i++) {
-		// DATA_GROUP_TEACH[i].next_node = `gt${i + 1}`;
+		DATA_GROUP_TEACH[i].next_node = `gt${i + 1}`;
 		localStorage.setItem(`gt${i}`, JSON.stringify(DATA_GROUP_TEACH[i]));
 	}
-	// DATA_GROUP_TEACH[DATA_GROUP_TEACH.length - 1].next_node = null;
-	// localStorage.setItem(`gt${DATA_GROUP_TEACH.length - 1}`, JSON.stringify(DATA_GROUP_TEACH[DATA_GROUP_TEACH.length - 1]));
+	DATA_GROUP_TEACH[DATA_GROUP_TEACH.length - 1].next_node = null;
+	localStorage.setItem(`gt${DATA_GROUP_TEACH.length - 1}`, JSON.stringify(DATA_GROUP_TEACH[DATA_GROUP_TEACH.length - 1]));
+	
 	localStorage.setItem('gt_m', JSON.stringify({
 		date: formatDate()
 
@@ -108,8 +109,8 @@ function loadData_GT() {
 			n_Node = DATA_GROUP_TEACH[DATA_GROUP_TEACH.length - 1].next_node;
 		}
 	} else {
-		getTAndG();
-		saveData_GT();
+		getTAndG(saveData_GT);
+		
 	}
 }
 
