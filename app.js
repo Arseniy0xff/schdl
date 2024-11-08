@@ -2,8 +2,7 @@
 let DATA_GROUP_TEACH = [], DATA_SCHEDULE = [];
 
 
-
-function getTAndG(customFunc = () => {}) {
+function getTAndG(customFunc = () => { }) {
 	let data_out;
 	fetch('http://services.niu.ranepa.ru/API/public/teacher/teachersAndGroupsList')
 		.then(response => {
@@ -25,18 +24,22 @@ function getTAndG(customFunc = () => {}) {
 
 
 function getSchedule(group_id, group_type, date_b, date_e, customFunc = () => { }) {
-	const data = {
+	
+	const prm = {
 		id: group_id,
 		dateBegin: date_b,
 		dateEnd: date_e
 	};
-	if (Boolean(group_type)) {
+
+
+	if (Boolean(Number(group_type))) {
+
 		fetch('http://services.niu.ranepa.ru/API/public/teacher/getSchedule', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify(data)
+			body: JSON.stringify(prm)
 		})
 			.then(response => {
 				if (!response.ok) {
@@ -52,35 +55,34 @@ function getSchedule(group_id, group_type, date_b, date_e, customFunc = () => { 
 			.catch(error => {
 				console.error('There was a problem with the fetch operation:', error);
 			});
+
 	} else {
+
 		fetch('http://services.niu.ranepa.ru/API/public/group/getSchedule', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify(data)
-		})
-			.then(response => {
-				if (!response.ok) {
-					throw new Error('Network response was not ok');
-				}
-				return response.json();
-			})
-			.then(data => {
-				DATA_SCHEDULE = data;
-				customFunc();
+			body: JSON.stringify(prm)
 
-			})
-			.catch(error => {
-				console.error('There was a problem with the fetch operation:', error);
-			});
+		}).then(response => {
+			if (!response.ok) {
+				throw new Error('Network response was not ok');
+			}
+			return response.json();
+		}).then(data => {
+			DATA_SCHEDULE = data;
+			customFunc();
+
+		}).catch(error => {
+			console.error('There was a problem with the fetch operation:', error);
+		});
 
 	}
 
-
-
-
 }
+
+
 
 
 function saveData_GT() {
@@ -90,12 +92,13 @@ function saveData_GT() {
 	}
 	DATA_GROUP_TEACH[DATA_GROUP_TEACH.length - 1].next_node = null;
 	localStorage.setItem(`gt${DATA_GROUP_TEACH.length - 1}`, JSON.stringify(DATA_GROUP_TEACH[DATA_GROUP_TEACH.length - 1]));
-	
+
 	localStorage.setItem('gt_m', JSON.stringify({
 		date: formatDate()
 
 	}));
 }
+
 
 
 
@@ -110,9 +113,11 @@ function loadData_GT() {
 		}
 	} else {
 		getTAndG(saveData_GT);
-		
+
 	}
 }
+
+
 
 
 function formatDate(changeDay = 0, changeMonth = 0, changeYear = 0) {
@@ -130,6 +135,8 @@ function formatDate(changeDay = 0, changeMonth = 0, changeYear = 0) {
 }
 
 
+
+
 function dateDifference(dateStr1, dateStr2) {
 	function parseDate(dateStr) {
 		const [day, month, year] = dateStr.split('.').map(Number);
@@ -144,6 +151,8 @@ function dateDifference(dateStr1, dateStr2) {
 }
 
 
+
+
 function getDateHumanType(dateString) {
 	const date = new Date(dateString);
 	const months = ["янв.", "фев.", "мар.", "апр.", "май", "июн.", "июл.", "авг.", "сен.", "окт.", "ноя.", "дек."];
@@ -153,6 +162,8 @@ function getDateHumanType(dateString) {
 	const weekday = weekdays[date.getDay()];
 	return [`${day} ${month}`, weekday];
 }
+
+
 
 
 function calcMatchWord(str, substring) {
@@ -167,6 +178,8 @@ function calcMatchWord(str, substring) {
 
 	return 100// * (lowerSubstring.length / lowerStr.length);
 }
+
+
 
 
 function max(arr) {
@@ -186,6 +199,8 @@ function max(arr) {
 }
 
 
+
+
 function scoreMatch(str, substring) {
 	let arr_words_str = str.split(' ');
 	let arr_words_sub = substring.trim().split(' ');
@@ -199,6 +214,7 @@ function scoreMatch(str, substring) {
 	// all_match /= arr_words_str.length;
 	return max(all_match);
 }
+
 
 
 

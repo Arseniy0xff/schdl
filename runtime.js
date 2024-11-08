@@ -39,17 +39,19 @@ function input_processing(text, enter_flag = false) {
 				suggestions.setAttribute('type', arr_rating[i].type);
 				suggestions.addEventListener('click', function () {
 					document.getElementById('in0').value = this.getAttribute('name');
-					setChoice(this.id, this.type);
+					setChoice(this.id, this.getAttribute('type'));
 				});
 				suggestions.innerHTML = `<span>${arr_rating[i].value_text}</span>`;
 				searchSection.append(suggestions);
 			}
 
 		}
+
 	}
 
-
 }
+
+
 
 
 function render_blocks() {
@@ -58,7 +60,8 @@ function render_blocks() {
 	suggestions.forEach(suggestion => {
 		suggestion.remove();
 	});
-	// console.log(arr_rating)
+
+	
 	const searchSection = document.getElementById('info-list');
 	let last_date = '';
 	for (let i = 0; i < DATA_SCHEDULE.length; i++) {
@@ -80,5 +83,7 @@ function render_blocks() {
 		// });
 		suggestions.innerHTML = `<span>${DATA_SCHEDULE[i].subject}</span>`;
 		searchSection.append(suggestions);
+	
 	}
+
 }

@@ -1,3 +1,6 @@
+function print(data) {
+	console.log(data);
+}
 
 
 // Flag responsible for open search place
@@ -66,7 +69,7 @@ function shrinkDiv() {
 
 
 function setChoice(oid, type) {
-	console.log(oid);
+	//console.log(oid, type);
 	document.getElementById('in0').blur();
 	shrinkDiv();
 	getSchedule(oid, type, formatDate(), formatDate(7), render_blocks);
@@ -74,7 +77,3 @@ function setChoice(oid, type) {
 	// 	console.log(DATA_SCHEDULE);
 	// },500)
 }
-
-
-
-
