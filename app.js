@@ -2,6 +2,9 @@
 let DATA_GROUP_TEACH = [], DATA_SCHEDULE = [];
 
 
+
+
+
 function getTAndG(customFunc = () => { }) {
 	let data_out;
 	fetch('http://services.niu.ranepa.ru/API/public/teacher/teachersAndGroupsList')
@@ -24,12 +27,33 @@ function getTAndG(customFunc = () => { }) {
 
 
 function getSchedule(group_id, group_type, date_b, date_e, customFunc = () => { }) {
-	
-	const prm = {
+	// group_type == 0 -> group
+	// group_type == 1 -> teacher
+
+	let prm = {
 		id: group_id,
 		dateBegin: date_b,
 		dateEnd: date_e
 	};
+
+	// let customPrivatFunc = () => {};
+	let flag_supplement = false;
+	let local_res = search_in_local_db(group_id, date_b, date_e);
+	if (local_res[0].length > 0) {
+		DATA_SCHEDULE = local_res[0];
+		customFunc(group_type);
+		flag_supplement = true;
+
+		prm.dateBegin = local_res[1][0];
+		prm.dateEnd = local_res[1][1];
+		
+		// customPrivatFunc = ;
+
+	}
+
+	if (prm.dateBegin == null || prm.dateEnd == null) {
+		return;
+	}
 
 
 	if (Boolean(Number(group_type))) {
@@ -40,21 +64,31 @@ function getSchedule(group_id, group_type, date_b, date_e, customFunc = () => { 
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify(prm)
-		})
-			.then(response => {
-				if (!response.ok) {
-					throw new Error('Network response was not ok');
-				}
-				return response.json();
-			})
-			.then(data => {
-				DATA_SCHEDULE = data;
-				customFunc();
 
-			})
-			.catch(error => {
-				console.error('There was a problem with the fetch operation:', error);
-			});
+		}).then(response => {
+
+			if (!response.ok) {
+				throw new Error('Network response was not ok');
+			}
+			return response.json();
+
+		}).then(data => {
+			if (flag_supplement) {
+				add_data_in_local_db(group_id, data);
+				DATA_SCHEDULE = DATA_SCHEDULE.concat(data);
+			} else {
+				DATA_SCHEDULE = data;
+				add_data_in_local_db(group_id, DATA_SCHEDULE);
+			}
+			
+			
+			customFunc(group_type);
+
+		}).catch(error => {
+
+			console.error('There was a problem with the fetch operation:', error);
+
+		});
 
 	} else {
 
@@ -71,8 +105,14 @@ function getSchedule(group_id, group_type, date_b, date_e, customFunc = () => { 
 			}
 			return response.json();
 		}).then(data => {
-			DATA_SCHEDULE = data;
-			customFunc();
+			if (flag_supplement) {
+				add_data_in_local_db(group_id, data);
+				DATA_SCHEDULE = DATA_SCHEDULE.concat(data);
+			} else {
+				DATA_SCHEDULE = data;
+				add_data_in_local_db(group_id, DATA_SCHEDULE);
+			}
+			customFunc(group_type);
 
 		}).catch(error => {
 			console.error('There was a problem with the fetch operation:', error);
@@ -83,39 +123,6 @@ function getSchedule(group_id, group_type, date_b, date_e, customFunc = () => { 
 }
 
 
-
-
-function saveData_GT() {
-	for (let i = 0; i < DATA_GROUP_TEACH.length; i++) {
-		DATA_GROUP_TEACH[i].next_node = `gt${i + 1}`;
-		localStorage.setItem(`gt${i}`, JSON.stringify(DATA_GROUP_TEACH[i]));
-	}
-	DATA_GROUP_TEACH[DATA_GROUP_TEACH.length - 1].next_node = null;
-	localStorage.setItem(`gt${DATA_GROUP_TEACH.length - 1}`, JSON.stringify(DATA_GROUP_TEACH[DATA_GROUP_TEACH.length - 1]));
-
-	localStorage.setItem('gt_m', JSON.stringify({
-		date: formatDate()
-
-	}));
-}
-
-
-
-
-// time of relevance TOR
-function loadData_GT() {
-
-	if (JSON.parse(localStorage.getItem('gt0')) != null) { // && dateDifference(JSON.parse(localStorage.getItem('gt_tor')).date, formatDate()) < 10
-		let n_Node = 'gt0';
-		while (n_Node != null) {
-			DATA_GROUP_TEACH.push(JSON.parse(localStorage.getItem(n_Node)));
-			n_Node = DATA_GROUP_TEACH[DATA_GROUP_TEACH.length - 1].next_node;
-		}
-	} else {
-		getTAndG(saveData_GT);
-
-	}
-}
 
 
 
@@ -213,6 +220,36 @@ function scoreMatch(str, substring) {
 	});
 	// all_match /= arr_words_str.length;
 	return max(all_match);
+}
+
+
+
+function getPairNumber(startTime, endTime) {
+	// Определяем стандартное время пар
+	const pairs = {
+		1: { start: "08:00", end: "09:30" },
+		2: { start: "09:40", end: "11:10" },
+		3: { start: "11:20", end: "12:50" },
+		4: { start: "13:20", end: "14:50" },
+		5: { start: "15:00", end: "16:30" },
+	};
+
+	// Проверяем каждую пару
+	for (const [pairNumber, times] of Object.entries(pairs)) {
+		if (times.start === startTime && times.end === endTime) {
+			return pairNumber;
+		}
+	}
+	return startTime;
+}
+
+function getLessonType(str) {
+	let st = str.split(' ');
+	if (st.length > 1) {
+		return st[0].slice(0, -1) + '.';
+	} else {
+		return str + '.';
+	}
 }
 
 

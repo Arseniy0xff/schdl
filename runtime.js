@@ -87,3 +87,85 @@ function render_blocks() {
 	}
 
 }
+
+
+function render_blocks_n(type_card) {
+	// Удаляем блок с подсказками
+	const suggestions = document.querySelectorAll('.info-card');
+	suggestions.forEach(suggestion => {
+		suggestion.remove();
+	});
+
+	let card, date;
+
+	function create_one_subj(num, teacher, subject, type, class_n) {
+		let info_block_n = document.createElement('div');
+		info_block_n.classList.add('info-block-n');
+
+
+		let info_block_ingrid_num = document.createElement('div');
+		info_block_ingrid_num.classList.add('info-block-ingrid-num');
+		info_block_ingrid_num.innerText = num;
+		info_block_n.append(info_block_ingrid_num);
+		
+
+		let info_block_ingrid_t = document.createElement('div');
+		info_block_ingrid_t.classList.add('info-block-ingrid-t');
+		info_block_ingrid_t.innerText = teacher;
+		info_block_n.append(info_block_ingrid_t);
+
+
+		let info_block_ingrid_s = document.createElement('div');
+		info_block_ingrid_s.classList.add('info-block-ingrid-s');
+		info_block_ingrid_s.innerText = subject;
+		info_block_n.append(info_block_ingrid_s);
+
+		let info_block_ingrid_c = document.createElement('div');
+		info_block_ingrid_c.classList.add('info-block-ingrid-c');
+		info_block_ingrid_c.innerText = type;
+		info_block_n.append(info_block_ingrid_c);
+
+		let info_block_ingrid_w = document.createElement('div');
+		info_block_ingrid_w.classList.add('info-block-ingrid-w');
+		info_block_ingrid_w.innerText = class_n;
+		info_block_n.append(info_block_ingrid_w);
+
+		return info_block_n;
+	}
+	
+	const searchSection = document.getElementById('info-list');
+	let last_date = '';
+	for (let i = 0; i < DATA_SCHEDULE.length; i++) {
+		if (DATA_SCHEDULE[i].xdt != last_date) {
+			last_date = DATA_SCHEDULE[i].xdt;
+			
+			if (card) {
+				searchSection.append(card);
+			}
+			
+			card = document.createElement('div');
+			card.classList.add('info-card');
+
+			date = document.createElement('div');
+			date.classList.add('info-date');
+			let hd = getDateHumanType(DATA_SCHEDULE[i].xdt);
+			date.innerHTML = `<span>${hd[0]} ${hd[1]}</span>`;
+
+			card.append(date);
+			
+
+		}
+
+		let num_pair = getPairNumber(DATA_SCHEDULE[i].nf, DATA_SCHEDULE[i].kf);
+		let info_block_n;
+		if (type_card == 0) {
+			info_block_n = create_one_subj(num_pair, DATA_SCHEDULE[i].teacher, DATA_SCHEDULE[i].subject, getLessonType(DATA_SCHEDULE[i].type), DATA_SCHEDULE[i].number);
+		} else {
+			info_block_n = create_one_subj(num_pair, DATA_SCHEDULE[i].group, DATA_SCHEDULE[i].subject, getLessonType(DATA_SCHEDULE[i].type), DATA_SCHEDULE[i].number);
+		}
+		
+		card.append(info_block_n);
+	
+	}
+
+}

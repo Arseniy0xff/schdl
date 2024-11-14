@@ -2,10 +2,17 @@ function startup() {
 	loadData_GT();
 }
 
+function fast_start() {
+	let vals = JSON.parse(localStorage.getItem('fast_start'));
+	if (vals == null) return
+	document.getElementById('in0').value = vals.in0;
+	getSchedule(vals.oid, vals.type, formatDate(), formatDate(7), render_blocks_n);
+}
 
 
 document.addEventListener('DOMContentLoaded', () => {
 	startup();
+	fast_start();
 	const in0 = document.getElementById('in0');
 	in0.addEventListener('keydown', function (event) {
 		if (event.key === 'Enter') {
