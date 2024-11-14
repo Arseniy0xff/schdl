@@ -6,7 +6,7 @@ function fast_start() {
 	let vals = JSON.parse(localStorage.getItem('fast_start'));
 	if (vals == null) return
 	document.getElementById('in0').value = vals.in0;
-	getSchedule(vals.oid, vals.type, formatDate(), formatDate(7), render_blocks_n);
+	getSchedule(vals.oid, vals.type, formatDate(), formatDate(60), render_blocks_n);
 }
 
 

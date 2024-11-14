@@ -73,7 +73,7 @@ function setChoice(oid, type) {
 	make_fast_start(document.getElementById('in0').value, oid, type);
 	document.getElementById('in0').blur();
 	shrinkDiv();
-	getSchedule(oid, type, formatDate(), formatDate(7), render_blocks_n);
+	getSchedule(oid, type, formatDate(), formatDate(30), render_blocks_n);
 	// setTimeout(()=>{
 	// 	console.log(DATA_SCHEDULE);
 	// },500)

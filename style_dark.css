@@ -236,6 +236,31 @@ p {
 	font-weight: 100;
 }
 
+.info-date-clear {
+	background-color: initial;
+	font-size: x-large;
+	margin: 2px;
+	text-align: center;
+	font-weight: 100;
+	
+}
+
+.info-date-clear span {
+	color: rgb(100, 100, 100);
+}
+
+
+.info-block-clear {
+	background-color: initial;
+	text-align: center;
+	font-size: x-large;
+}
+
+.info-block-clear span {
+	color: rgb(100, 100, 100);
+}
+
+
 .info-tname {
 	font-weight: 100;
 	font-size: small;

@@ -61,7 +61,7 @@ function render_blocks() {
 		suggestion.remove();
 	});
 
-	
+
 	const searchSection = document.getElementById('info-list');
 	let last_date = '';
 	for (let i = 0; i < DATA_SCHEDULE.length; i++) {
@@ -83,7 +83,7 @@ function render_blocks() {
 		// });
 		suggestions.innerHTML = `<span>${DATA_SCHEDULE[i].subject}</span>`;
 		searchSection.append(suggestions);
-	
+
 	}
 
 }
@@ -96,7 +96,56 @@ function render_blocks_n(type_card) {
 		suggestion.remove();
 	});
 
+
+
+	function getMissingDays(startDateStr, endDateStr) {
+		const startDate = new Date(startDateStr);
+		const endDate = new Date(endDateStr);
+		const missingDays = [];
+
+		let currentDate = new Date(startDate);
+		currentDate.setDate(currentDate.getDate() + 1);
+
+		while (currentDate < endDate) {
+
+			const year = currentDate.getFullYear();
+			const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+			const day = String(currentDate.getDate()).padStart(2, '0');
+			const formattedDate = `${year}-${month}-${day} 00:00:00.000`;
+			missingDays.push(formattedDate);
+			// Переходим к следующему дню
+			currentDate.setDate(currentDate.getDate() + 1);
+		}
+
+		return missingDays;
+	}
+
+
+
 	let card, date;
+
+
+	function create_clear_card(arr) {
+		for (let i = 0; i < arr.length; i++) {
+			card = document.createElement('div');
+			card.classList.add('info-card');
+
+			date = document.createElement('div');
+			date.classList.add('info-date-clear');
+			let hd = getDateHumanType(arr[i]);
+			date.innerHTML = `<span>${hd[0]} ${hd[1]}</span>`;
+			card.append(date);
+
+			let info_block_clear = document.createElement('div');
+			info_block_clear.classList.add('info-block-clear');
+			info_block_clear.innerHTML = '<span>...</span>';
+			card.append(info_block_clear);
+			searchSection.append(card);
+
+		}
+		
+	}
+
 
 	function create_one_subj(num, teacher, subject, type, class_n) {
 		let info_block_n = document.createElement('div');
@@ -107,7 +156,7 @@ function render_blocks_n(type_card) {
 		info_block_ingrid_num.classList.add('info-block-ingrid-num');
 		info_block_ingrid_num.innerText = num;
 		info_block_n.append(info_block_ingrid_num);
-		
+
 
 		let info_block_ingrid_t = document.createElement('div');
 		info_block_ingrid_t.classList.add('info-block-ingrid-t');
@@ -132,17 +181,25 @@ function render_blocks_n(type_card) {
 
 		return info_block_n;
 	}
-	
+
 	const searchSection = document.getElementById('info-list');
 	let last_date = '';
 	for (let i = 0; i < DATA_SCHEDULE.length; i++) {
 		if (DATA_SCHEDULE[i].xdt != last_date) {
-			last_date = DATA_SCHEDULE[i].xdt;
-			
+
 			if (card) {
 				searchSection.append(card);
 			}
-			
+
+			let msd = getMissingDays(last_date, DATA_SCHEDULE[i].xdt);
+			if (msd.length > 0) {
+				create_clear_card(msd);
+			}
+
+
+			last_date = DATA_SCHEDULE[i].xdt;
+
+
 			card = document.createElement('div');
 			card.classList.add('info-card');
 
@@ -152,7 +209,7 @@ function render_blocks_n(type_card) {
 			date.innerHTML = `<span>${hd[0]} ${hd[1]}</span>`;
 
 			card.append(date);
-			
+
 
 		}
 
@@ -163,9 +220,9 @@ function render_blocks_n(type_card) {
 		} else {
 			info_block_n = create_one_subj(num_pair, DATA_SCHEDULE[i].group, DATA_SCHEDULE[i].subject, getLessonType(DATA_SCHEDULE[i].type), DATA_SCHEDULE[i].number);
 		}
-		
+
 		card.append(info_block_n);
-	
+
 	}
 
 }
