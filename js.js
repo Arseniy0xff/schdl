@@ -68,12 +68,12 @@ function shrinkDiv() {
 
 
 
-function setChoice(oid, type) {
+function setChoice(oid, type, filt_col='', filt='') {
 	//console.log(oid, type);
-	make_fast_start(document.getElementById('in0').value, oid, type);
+	make_fast_start(document.getElementById('in0').value, oid, type, filt_col, filt);
 	document.getElementById('in0').blur();
 	shrinkDiv();
-	getSchedule(oid, type, formatDate(), formatDate(30), render_blocks_n);
+	getSchedule(oid, type, formatDate(), formatDate(LOADING_RANGE), render_blocks_n, filt_col, filt);
 	// setTimeout(()=>{
 	// 	console.log(DATA_SCHEDULE);
 	// },500)

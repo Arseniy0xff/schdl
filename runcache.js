@@ -29,11 +29,13 @@ function loadData_GT() {
 
 
 
-function make_fast_start(input_val, oid, type) {
+function make_fast_start(input_val, oid, type, filt_col, filt) {
 	localStorage.setItem('fast_start', JSON.stringify({
 		in0: input_val,
 		oid: oid,
-		type: type
+		type: type,
+		filt_col: filt_col,
+		filt: filt,
 	}));
 }
 
@@ -102,7 +104,7 @@ function add_data_in_local_db(label, arr_obj) {
 function search_in_local_db(oid, date_b, date_e) {
 	let data_in_storage = JSON.parse(localStorage.getItem('DATA_SCHEDULE_ALL'));
 	if (data_in_storage == null) {
-data_in_storage = [];
+		data_in_storage = [];
 	}
 	function parseDate(dateString) {
 		const [day, month, year] = dateString.split('.').map(Number);

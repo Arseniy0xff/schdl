@@ -1,11 +1,17 @@
 function input_processing(text, enter_flag = false) {
 	// console.log(text);
+
+	let arr_multi_sort = text.split('@');
+	arr_multi_sort = arr_multi_sort.map(item => item.trim());
+	// console.log(arr_multi_sort);
+
+
 	let arr_rating = [];
 	for (let i = 0; i < DATA_GROUP_TEACH.length; i++) {
 		arr_rating.push({
 			oid: DATA_GROUP_TEACH[i].oid,
 			type: DATA_GROUP_TEACH[i].type,
-			value_proc: scoreMatch(DATA_GROUP_TEACH[i].value, text),
+			value_proc: scoreMatch(DATA_GROUP_TEACH[i].value, arr_multi_sort[0]), // value_proc: scoreMatch(DATA_GROUP_TEACH[i].value, text),
 			value_text: DATA_GROUP_TEACH[i].value
 		});
 	}
@@ -16,33 +22,111 @@ function input_processing(text, enter_flag = false) {
 	}
 
 
+	/*
+		d_rating_group = {
+			'13:20': ['nf', <score>],
+			'СО 203а': ['number', <score>],
+		};
+
+		arr_rating_group = [
+			['nf', '13:20'],		// score 2 e.
+			['number', 'СО 203а']	// score 1 e.
+		];
+
+	*/
+
+	let d_rating_group = {};
+	let arr_rating_group = [];
+
+	if (arr_multi_sort.length > 1) {
+
+
+		let res = search_in_local_db(arr_rating[0].oid, formatDate(), formatDate(LOADING_RANGE))[0];
+		if (res.length > 0) {
+			for (let i = 0; i < res.length; i++) {
+				for (let j = 0; j < SEARCH_LIMIT.length; j++) {
+					if (res[i][SEARCH_LIMIT[j]] !== undefined) {
+						if (d_rating_group[res[i][SEARCH_LIMIT[j]]] === undefined) {
+							d_rating_group[res[i][SEARCH_LIMIT[j]]] = [SEARCH_LIMIT[j], scoreMatch(res[i][SEARCH_LIMIT[j]], arr_multi_sort[1])];
+						}
+					}
+				}
+			}
+		}
+
+		// print(d_rating_group);
+		arr_rating_group = sortObjectEntries(d_rating_group);
+		if (arr_rating_group.length > 10) {
+			arr_rating_group = arr_rating_group.slice(0, 10);
+		}
+
+
+	}
+
+
+
 	if (enter_flag) {
-		document.getElementById('in0').value = arr_rating[0].value_text;
-		setChoice(arr_rating[0].oid, arr_rating[0].type);
+		if (arr_multi_sort.length > 1) {
+			document.getElementById('in0').value = arr_rating[0].value_text + '@' + arr_rating_group[0][1];
+			setChoice(arr_rating[0].oid, arr_rating[0].type, arr_rating_group[0][0], arr_rating_group[0][1]);
+		} else {
+			document.getElementById('in0').value = arr_rating[0].value_text;
+			setChoice(arr_rating[0].oid, arr_rating[0].type);
+		}
+		
 
 
 	} else {
 		if (isExpanded) {
-			// Удаляем блок с подсказками
-			const suggestions = document.querySelectorAll('.search-block');
-			suggestions.forEach(suggestion => {
-				suggestion.remove();
-			});
-			// console.log(arr_rating)
-			const searchSection = document.getElementById('search-section');
 
-			for (let i = 0; i < arr_rating.length; i++) {
-				const suggestions = document.createElement('div');
-				suggestions.classList.add('search-block');
-				suggestions.id = arr_rating[i].oid;
-				suggestions.setAttribute('name', arr_rating[i].value_text);
-				suggestions.setAttribute('type', arr_rating[i].type);
-				suggestions.addEventListener('click', function () {
-					document.getElementById('in0').value = this.getAttribute('name');
-					setChoice(this.id, this.getAttribute('type'));
+			if (arr_multi_sort.length > 1) {
+				const suggestions = document.querySelectorAll('.search-block');
+				suggestions.forEach(suggestion => {
+					suggestion.remove();
 				});
-				suggestions.innerHTML = `<span>${arr_rating[i].value_text}</span>`;
-				searchSection.append(suggestions);
+				// console.log(arr_rating)
+				const searchSection = document.getElementById('search-section');
+
+				for (let i = 0; i < arr_rating_group.length; i++) {
+					const suggestions = document.createElement('div');
+					suggestions.classList.add('search-block');
+					suggestions.id = arr_rating[0].oid;
+					suggestions.setAttribute('name', arr_rating[0].value_text);
+					suggestions.setAttribute('type', arr_rating[0].type);
+					suggestions.setAttribute('filt_col', arr_rating_group[i][0]);
+					suggestions.setAttribute('filt', arr_rating_group[i][1]);
+					suggestions.addEventListener('click', function () {
+						document.getElementById('in0').value = this.getAttribute('name') + '@' + this.getAttribute('filt');
+						setChoice(this.id, this.getAttribute('type'), this.getAttribute('filt_col'), this.getAttribute('filt'));
+					});
+					suggestions.innerHTML = `<span>${arr_rating[0].value_text}@${arr_rating_group[i][1]}</span>`;
+					searchSection.append(suggestions);
+				}
+			} else {
+				// Удаляем блок с подсказками
+				const suggestions = document.querySelectorAll('.search-block');
+				suggestions.forEach(suggestion => {
+					suggestion.remove();
+				});
+				// console.log(arr_rating)
+				const searchSection = document.getElementById('search-section');
+
+				for (let i = 0; i < arr_rating.length; i++) {
+					const suggestions = document.createElement('div');
+					suggestions.classList.add('search-block');
+					suggestions.id = arr_rating[i].oid;
+					suggestions.setAttribute('name', arr_rating[i].value_text);
+					suggestions.setAttribute('type', arr_rating[i].type);
+					suggestions.setAttribute('filt_col', '');
+					suggestions.setAttribute('filt', '');
+					suggestions.addEventListener('click', function () {
+						document.getElementById('in0').value = this.getAttribute('name');
+						setChoice(this.id, this.getAttribute('type'));
+					});
+					suggestions.innerHTML = `<span>${arr_rating[i].value_text}</span>`;
+					searchSection.append(suggestions);
+				}
+
 			}
 
 		}
@@ -89,7 +173,7 @@ function render_blocks() {
 }
 
 
-function render_blocks_n(type_card) {
+function render_blocks_n(type_card, filt_col = '', filt = '') {
 	// Удаляем блок с подсказками
 	const suggestions = document.querySelectorAll('.info-card');
 	suggestions.forEach(suggestion => {
@@ -143,7 +227,7 @@ function render_blocks_n(type_card) {
 			searchSection.append(card);
 
 		}
-		
+
 	}
 
 
@@ -185,6 +269,9 @@ function render_blocks_n(type_card) {
 	const searchSection = document.getElementById('info-list');
 	let last_date = '';
 	for (let i = 0; i < DATA_SCHEDULE.length; i++) {
+
+		
+
 		if (DATA_SCHEDULE[i].xdt != last_date) {
 
 			if (card) {
@@ -195,6 +282,7 @@ function render_blocks_n(type_card) {
 			if (msd.length > 0) {
 				create_clear_card(msd);
 			}
+
 
 
 			last_date = DATA_SCHEDULE[i].xdt;
@@ -212,7 +300,11 @@ function render_blocks_n(type_card) {
 
 
 		}
-
+		
+		// console.log(DATA_SCHEDULE[i][filt_col], filt);
+		if (DATA_SCHEDULE[i][filt_col] != filt && filt != '' && filt_col != '') {
+			continue;
+		}
 		let num_pair = getPairNumber(DATA_SCHEDULE[i].nf, DATA_SCHEDULE[i].kf);
 		let info_block_n;
 		if (type_card == 0) {

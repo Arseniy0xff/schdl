@@ -6,7 +6,7 @@ function fast_start() {
 	let vals = JSON.parse(localStorage.getItem('fast_start'));
 	if (vals == null) return
 	document.getElementById('in0').value = vals.in0;
-	getSchedule(vals.oid, vals.type, formatDate(), formatDate(60), render_blocks_n);
+	getSchedule(vals.oid, vals.type, formatDate(), formatDate(60), render_blocks_n, vals.filt_col, vals.filt);
 }
 
 
@@ -26,3 +26,19 @@ document.addEventListener('DOMContentLoaded', () => {
 		input_processing(in0.value);
 	});
 })
+	
+
+window.addEventListener('scroll', function() {
+    // Проверяем, достигли ли мы конца страницы
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+        // Здесь можно вызвать функцию для подгрузки нового контента
+        loadMoreContent();
+    }
+});
+
+function loadMoreContent() {
+    // Логика для подгрузки нового контента
+    console.log('Загружаем новый контент...');
+    // Например, можно сделать AJAX-запрос для получения данных
+}
+	

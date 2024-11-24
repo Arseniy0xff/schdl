@@ -26,7 +26,7 @@ function getTAndG(customFunc = () => { }) {
 }
 
 
-function getSchedule(group_id, group_type, date_b, date_e, customFunc = () => { }) {
+function getSchedule(group_id, group_type, date_b, date_e, customFunc = () => { }, filt_col='', filt='') {
 	// group_type == 0 -> group
 	// group_type == 1 -> teacher
 
@@ -39,14 +39,23 @@ function getSchedule(group_id, group_type, date_b, date_e, customFunc = () => { 
 	// let customPrivatFunc = () => {};
 	let flag_supplement = false;
 	let local_res = search_in_local_db(group_id, date_b, date_e);
+	/*
+	local_res = [
+		[{}, {}],
+		[DateBegin, DateEnd] // Диапазон нехватки данных
+	]
+	
+	*/
+
+
 	if (local_res[0].length > 0) {
 		DATA_SCHEDULE = local_res[0];
-		customFunc(group_type);
+		customFunc(group_type, filt_col, filt);
 		flag_supplement = true;
 
 		prm.dateBegin = local_res[1][0];
 		prm.dateEnd = local_res[1][1];
-		
+
 		// customPrivatFunc = ;
 
 	}
@@ -80,9 +89,9 @@ function getSchedule(group_id, group_type, date_b, date_e, customFunc = () => { 
 				DATA_SCHEDULE = data;
 				add_data_in_local_db(group_id, DATA_SCHEDULE);
 			}
-			
-			
-			customFunc(group_type);
+
+
+			customFunc(group_type, filt_col, filt);
 
 		}).catch(error => {
 
@@ -112,7 +121,7 @@ function getSchedule(group_id, group_type, date_b, date_e, customFunc = () => { 
 				DATA_SCHEDULE = data;
 				add_data_in_local_db(group_id, DATA_SCHEDULE);
 			}
-			customFunc(group_type);
+			customFunc(group_type, filt_col, filt);
 
 		}).catch(error => {
 			console.error('There was a problem with the fetch operation:', error);
@@ -221,6 +230,25 @@ function scoreMatch(str, substring) {
 	// all_match /= arr_words_str.length;
 	return max(all_match);
 }
+
+
+
+
+function sortObjectEntries(obj) {
+    const entries = Object.entries(obj).flatMap(([key, [name, score]]) => {
+        return [[name, key]];
+    });
+
+    // sort by score regress
+    entries.sort((a, b) => {
+        const scoreA = obj[a[1]][1];
+        const scoreB = obj[b[1]][1];
+        return scoreB - scoreA;
+    });
+
+    return entries;
+}
+
 
 
 
