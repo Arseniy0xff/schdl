@@ -1,56 +1,47 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import requests
 
+
 app = Flask(__name__)
+CORS(app)
 
-# Список доступных API с их методами
-API_LIST = {
-    1: {
-        'url': 'http://services.niu.ranepa.ru/API/public/teacher/teachersAndGroupsList',
-        'method': 'GET'
-    },
-    2: {
-        'url': 'http://services.niu.ranepa.ru/API/public/teacher/getSchedule', 
-        'method': 'POST'
-    },
-    3: {
-        'url': 'http://services.niu.ranepa.ru/API/public/group/getSchedule', 
-        'method': 'POST'
-    },
-}
 
-@app.route('/api/proxy', methods=['GET', 'POST', 'PUT', 'DELETE'])
+@app.route('/', methods=['OPTIONS'])
+def options():
+    return '', 200  # Возвращаем статус 200 для OPTIONS запроса
+
+
+@app.route("/proxy", methods=["POST"])
 def proxy():
-    url = request.args.get('url')
-    number = request.args.get('number')
+    # Получаем данные из POST-запроса
+    data = request.json
+    if not data:
+        return jsonify({"error": "Request body must be JSON"}), 400
 
-    # Проверяем, передан ли URL или число
-    if url:
-        target_url = url
-        method = request.method  # Используем метод запроса
-    elif number and number.isdigit() and int(number) in API_LIST:
-        target_url = API_LIST[int(number)]['url']
-        method = API_LIST[int(number)]['method']
-    else:
-        return jsonify({'error': 'Invalid input. Provide either a valid URL or a number.'}), 400
+    # Проверяем обязательные параметры
+    if "url" not in data or "type" not in data:
+        return jsonify({"error": "Missing required parameters: url and type"}), 400
+
+    url = data["url"]
+    request_type = data["type"].upper()
+    params = {key: value for key, value in data.items() if key in ["id", "dateBegin", "dateEnd"]}
+
+    if request_type not in ["GET", "POST"]:
+        return jsonify({"error": "Invalid request type. Supported types are GET and POST"}), 400
 
     try:
-        # Перенаправляем запрос к целевому API в зависимости от метода
-        if method == 'GET':
-            response = requests.get(target_url, params=request.args)
-        elif method == 'POST':
-            response = requests.post(target_url, json=request.get_json())
-        elif method == 'PUT':
-            response = requests.put(target_url, json=request.get_json())
-        elif method == 'DELETE':
-            response = requests.delete(target_url, json=request.get_json())
-        else:
-            return jsonify({'error': 'Unsupported method.'}), 405
+        # Выполняем запрос в зависимости от типа
+        if request_type == "GET":
+            response = requests.get(url, params=params)
+        elif request_type == "POST":
+            response = requests.post(url, json=params)
+        
+        # Проверяем статус ответа
+        response.raise_for_status()
+        return jsonify(response.json()), response.status_code
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": "Request failed", "details": str(e)}), 500
 
-        # Возвращаем ответ клиенту
-        return (response.content, response.status_code, {'Content-Type': response.headers['Content-Type']})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, ssl_context='adhoc')  # Используйте ssl_context для HTTPS
+if __name__ == "__main__":
+    app.run(debug=True)

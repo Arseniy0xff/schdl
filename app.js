@@ -7,7 +7,18 @@ let DATA_GROUP_TEACH = [], DATA_SCHEDULE = [];
 
 function getTAndG(customFunc = () => { }) {
 	let data_out;
-	fetch('http://services.niu.ranepa.ru/API/public/teacher/teachersAndGroupsList')
+	let prm = {
+		url: 'http://services.niu.ranepa.ru/API/public/teacher/teachersAndGroupsList',
+		type: 'GET',
+	}
+	fetch('http://127.0.0.1:5000/proxy',{
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify(prm)
+
+	})
 		.then(response => {
 			if (!response.ok) {
 				throw new Error('Network response was not ok');
@@ -31,6 +42,8 @@ function getSchedule(group_id, group_type, date_b, date_e, customFunc = () => { 
 	// group_type == 1 -> teacher
 
 	let prm = {
+		url: '',
+		type: 'POST',
 		id: group_id,
 		dateBegin: date_b,
 		dateEnd: date_e
@@ -66,9 +79,10 @@ function getSchedule(group_id, group_type, date_b, date_e, customFunc = () => { 
 
 
 	if (Boolean(Number(group_type))) {
-
-		fetch('http://services.niu.ranepa.ru/API/public/teacher/getSchedule', {
+		prm.url = 'http://services.niu.ranepa.ru/API/public/teacher/getSchedule';
+		fetch('http://127.0.0.1:5000/proxy', {
 			method: 'POST',
+			type: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			},
@@ -100,9 +114,10 @@ function getSchedule(group_id, group_type, date_b, date_e, customFunc = () => { 
 		});
 
 	} else {
-
-		fetch('http://services.niu.ranepa.ru/API/public/group/getSchedule', {
+		prm.url = 'http://services.niu.ranepa.ru/API/public/group/getSchedule';
+		fetch('http://127.0.0.1:5000/proxy', {
 			method: 'POST',
+			type: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			},
