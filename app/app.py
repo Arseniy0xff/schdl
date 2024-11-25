@@ -14,7 +14,6 @@ def options():
 
 @app.route("/proxy", methods=["POST"])
 def proxy():
-    # Получаем данные из POST-запроса
     data = request.json
     if not data:
         return jsonify({"error": "Request body must be JSON"}), 400
@@ -37,7 +36,6 @@ def proxy():
         elif request_type == "POST":
             response = requests.post(url, json=params)
         
-        # Проверяем статус ответа
         response.raise_for_status()
         return jsonify(response.json()), response.status_code
     except requests.exceptions.RequestException as e:

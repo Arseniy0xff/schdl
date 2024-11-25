@@ -11,7 +11,7 @@ function getTAndG(customFunc = () => { }) {
 		url: 'http://services.niu.ranepa.ru/API/public/teacher/teachersAndGroupsList',
 		type: 'GET',
 	}
-	fetch('http://127.0.0.1:5000/proxy',{
+	fetch(SERVICE_URL,{
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json'
@@ -80,7 +80,7 @@ function getSchedule(group_id, group_type, date_b, date_e, customFunc = () => { 
 
 	if (Boolean(Number(group_type))) {
 		prm.url = 'http://services.niu.ranepa.ru/API/public/teacher/getSchedule';
-		fetch('http://127.0.0.1:5000/proxy', {
+		fetch(SERVICE_URL, {
 			method: 'POST',
 			type: 'POST',
 			headers: {
@@ -115,7 +115,7 @@ function getSchedule(group_id, group_type, date_b, date_e, customFunc = () => { 
 
 	} else {
 		prm.url = 'http://services.niu.ranepa.ru/API/public/group/getSchedule';
-		fetch('http://127.0.0.1:5000/proxy', {
+		fetch(SERVICE_URL, {
 			method: 'POST',
 			type: 'POST',
 			headers: {
