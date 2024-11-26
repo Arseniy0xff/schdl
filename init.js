@@ -1,7 +1,9 @@
 function startup() {
 	getSchedule = getSchedule_nser;
+	getTAndG = getTAndG_nser;
 	if (USE_SERVICE) {
 		getSchedule = getSchedule_ser;
+		getTAndG = getTAndG_ser;
 	}
 	loadData_GT();
 }
