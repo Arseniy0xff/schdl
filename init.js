@@ -1,4 +1,8 @@
 function startup() {
+	getSchedule = getSchedule_nser;
+	if (USE_SERVICE) {
+		getSchedule = getSchedule_ser;
+	}
 	loadData_GT();
 }
 
