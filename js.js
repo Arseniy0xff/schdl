@@ -67,6 +67,12 @@ function shrinkDiv() {
 }
 
 
+function clearLocalStorage() {
+	localStorage.clear();
+	location.reload();
+}
+
+
 
 function setChoice(oid, type, filt_col='', filt='') {
 	//console.log(oid, type);
