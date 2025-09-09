@@ -36,12 +36,27 @@ function expandDiv() {
 	}
 
 }
+  
+window.addEventListener('scroll', function() {
+	const input = document.getElementById('s-div');
+	const list = document.getElementById('info-list');
 
+	if (window.scrollY > (window.innerHeight * 0.10) / 2) { 
+	  input.classList.add('unfocus');
+	  list.classList.remove('blur');
+	} else {
+	  input.classList.remove('unfocus');
+	  list.classList.add('blur');
+	}
+  });
+  
 
 // close search place
 function shrinkDiv() {
 	if (isExpanded) {
 		isExpanded = false;
+		const input = document.getElementById('s-div');
+		input.classList.add('unfocus');
 
 		const div = document.getElementById('s-div');
 		div.classList.remove('exp-0');
