@@ -41,7 +41,7 @@ window.addEventListener('scroll', function() {
 	const input = document.getElementById('s-div');
 	const list = document.getElementById('info-list');
 
-	if (window.scrollY > (window.innerHeight * 0.10) / 2) { 
+	if (window.scrollY > (window.innerHeight * 0.10) / 8) { 
 	  input.classList.add('unfocus');
 	  list.classList.remove('blur');
 	} else {

@@ -44,7 +44,7 @@ p {
 	border-radius: 20px;
 	/*border: 1px solid rgba(127, 127, 127, 0.4);*/
 	color: rgba(0, 0, 0, 0.5);
-	
+
 	transition: var(--transition-effect);
 	max-width: 800px;
 	box-shadow: 0 0 35px 2px rgb(0, 0, 0);
@@ -57,9 +57,17 @@ p {
 	box-shadow: 0 0 30px 20px rgba(255, 255, 255, 0.11);
 	background-color: rgba(255, 255, 255, 0.1);
 	top: 20px;
+
+	box-shadow: 0 0 20px 7px rgba(255, 255, 255, 0.16);
+	background-color: rgba(255, 255, 255, 0.15);
+	top: 20px;
+	width: 30%;
+	text-align: center;
+	backdrop-filter: blur(2px);
 }
 
 .s-div.exp-0 {
+	width: 90%;
 	padding: 15px 15px;
 	/* border-radius: 25px; */
 	height: 640px;
@@ -80,9 +88,10 @@ p {
 	box-sizing: border-box;
 	/* padding: 5px; */
 	transition: var(--transition-effect);
-	color: rgba(255, 255, 255, 0.2);
+	color: rgba(255, 255, 255, 0.4);
 	font-weight: bold;
 	padding: 6px 10px;
+	text-align: inherit;
 }
 
 .main-input.fake-focus {
@@ -94,6 +103,7 @@ p {
 	font-size: 16px;
 	color: rgb(255, 255, 255);
 	padding: 5px;
+	text-align: left;
 }
 
 
